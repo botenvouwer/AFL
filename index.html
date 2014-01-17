@@ -90,7 +90,16 @@
 			}
 		</script>
 		<script>
+		
+			var canvas = null;
+			var context = null;
+			var cue = [];
+			
 			$(document).ready(function(){
+				canvas=document.getElementById("myCanvas");
+				context=canvas.getContext("2d");
+		
+			
 				/*// animated circle
 				(function() {
 				  var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
@@ -134,14 +143,44 @@
 				 
 				
 				drawAnimatedLine(10, 30, 40, 145, 120);
-				//drawAnimatedLine(10, 145, 120, 200, 230);
+				drawAnimatedLine(10, 97, 35, 160, 170);
+				drawAnimatedLine(10, 180, 130, 90, 35);
 				
 			 });
 			 
+			
+			
 			function drawAnimatedLine(speed, fromx, fromy, tox, toy){
 				
-				var canvas=document.getElementById("myCanvas");
-				var context=canvas.getContext("2d");
+				key = -1 + (cue.length + 1);
+				cue[key] = {
+					'speed': speed,
+					'fromx': fromx,
+					'fromy': fromy,
+					'tox': tox,
+					'toy': toy,
+					'done':false,
+					'bussy':false
+				};
+				
+				if(key == 0){
+					AnimatedLine(speed, fromx, fromy, tox, toy, key);
+				}
+				
+			}
+			
+			function animateNext(){
+				$.each(cue, function(key, value){
+					if(!value.done && !value.bussy){
+						value.bussy = true;
+						AnimatedLine(value.speed, value.fromx, value.fromy, value.tox, value.toy, key);
+						return false;
+					}
+				});
+			}
+			
+			function AnimatedLine(speed, fromx, fromy, tox, toy, cueKey){
+				context.beginPath();
 				context.strokeStyle="green";
 				
 				console.log('tox:'+tox);
@@ -186,6 +225,8 @@
 					if(a == lowest){
 						console.log('stop');
 						clearInterval(animate);
+						cue[cueKey].done = true;
+						animateNext();
 						return;
 					}
 					console.log('Drawing...');
@@ -195,18 +236,26 @@
 				},speed);
 			}
 			
-			
-			function cnvs_getCoordinates(e)
-			{
-				x=e.clientX;
-				y=e.clientY;
-				document.getElementById("xycoordinates").innerHTML="Coordinates: (" + x + "," + y + ")";
-			}
+			$(document).ready(function(){
+			 	function writeMessage(message) {
+		        	$('#cor').html(message);
+		      	}
+		      function getMousePos(canvas, evt) {
+		        var rect = canvas.getBoundingClientRect();
+		        return {
+		          x: evt.clientX - rect.left,
+		          y: evt.clientY - rect.top
+		        };
+		      }
+		      var canvas = document.getElementById('myCanvas');
+		      var context = canvas.getContext('2d');
 
-			function cnvs_clearCoordinates()
-			{
-				document.getElementById("xycoordinates").innerHTML="";
-			}
+		      canvas.addEventListener('mousemove', function(evt) {
+		        var mousePos = getMousePos(canvas, evt);
+		        var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
+		        writeMessage(message);
+		      }, false);
+			 });
 		</script>
 	</head>
 	<body>
@@ -217,7 +266,7 @@
 			<input type="checkbox" id="test4" name="test[]" value="value4" ><label for="test4">Label4</label><br>
 			<input type="submit" value="Test">
 		</form>
-		<canvas id="myCanvas" width="250" height="250" style="border: 1px solid red;" onmousemove="cnvs_getCoordinates(event)" onmouseout="cnvs_clearCoordinates()"></canvas>
-		<div id="xycoordinates"></div>
+		<canvas id="myCanvas" width="250" height="250" style="border: 1px solid red;"></canvas>
+		<div id="cor"></div>
 	</body>
 </html>
