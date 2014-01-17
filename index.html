@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title>Animated checkboxes and radio buttons</title>
+		<script src="jquery-2.0.3.js"></script>
+		<style>
+			body{
+				font-family: arial;
+			}
+			
+			.checkbox-canvas{
+				width: 15px;
+				height: 15px;
+				border: 1px solid rgb(0, 0, 0);
+				background: rgb(255, 255, 255);
+				margin: 0px;
+				padding: 0px;
+			}
+			
+			.checkbox-canvas:hover{
+				
+			}
+			
+			.checkbox-canvas:focus{
+				outline: none;
+			}
+			
+			label{
+				font-size: 16px;
+				margin-left: 6px;
+			}
+			
+			
+		</style>
+		<script>
+			$(document).ready(function(){
+				
+				$('input[type=checkbox]').each(function(key, checkbox){
+					var id = $(this).attr('id');
+					var canvasChekbox = '<canvas id="checkbox_canvas_'+id+'" class="checkbox-canvas" ></canvas>';
+					
+					$(this).after(canvasChekbox);
+					$(this).css('display', 'none');
+					
+					if(!$(this).prop('checked')){
+						$(this).prop('checked', false);
+						$(canvasChekbox).removeClass('checked');
+						resetCanvasCheckbox($('#checkbox_canvas_'+id));
+					}
+					else{
+						$(this).prop('checked', true);
+						$(this).addClass('checked');
+						animateCanvasChekbox($('#checkbox_canvas_'+id));
+					}
+					
+				});
+				
+				$('body').on('click', 'canvas.checkbox-canvas', function(){
+					handleCanvasCheckbox(this);
+				});
+				
+			});
+			
+			function handleCanvasCheckbox(checkBoxCanvas){
+				
+				var checkBoxCanvasID = $(checkBoxCanvas).attr('id');
+					originalCheckboxID = checkBoxCanvasID.replace("checkbox_canvas_","");
+				
+				if($('#'+originalCheckboxID).prop('checked')){
+					$('#'+originalCheckboxID).prop('checked', false);
+					$(checkBoxCanvas).removeClass('checked');
+					resetCanvasCheckbox(checkBoxCanvas);
+				}
+				else{
+					$('#'+originalCheckboxID).prop('checked', true);
+					$(checkBoxCanvas).addClass('checked');
+					animateCanvasChekbox(checkBoxCanvas);
+				}
+				
+			}
+			
+			function resetCanvasCheckbox(checkBoxCanvas){
+				$(checkBoxCanvas).css('border', '1px solid');
+			}
+			
+			function animateCanvasChekbox(checkBoxCanvas){
+				
+				$(checkBoxCanvas).css('border', '1px solid red');
+				
+			}
+		</script>
+		<script>
+			$(document).ready(function(){
+				/*// animated circle
+				(function() {
+				  var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+				                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+				  window.requestAnimationFrame = requestAnimationFrame;
+				})();
+				 
+				
+				var canvas = document.getElementById('myCanvas');
+				 var context = canvas.getContext('2d');
+				 var x = canvas.width / 2;
+				 var y = canvas.height / 2;
+				 var radius = 50;
+				 var endPercent = 110;
+				 var curPerc = 0;
+				 var circ = Math.PI * 2;
+				 var quart = Math.PI / 2;
+				
+				 context.lineWidth = 2;
+				 context.strokeStyle = '#ad2323';
+				 context.shadowOffsetX = 0;
+				 context.shadowOffsetY = 0;
+				 context.shadowBlur = 10;
+				 context.shadowColor = '#656565';
+				
+				
+				 function animate(current) {
+				     context.clearRect(0, 0, canvas.width, canvas.height);
+				     context.beginPath();
+				     context.arc(x, y, radius, -(quart), ((circ) * current) - quart, false);
+				     context.stroke();
+				     curPerc++;
+				     if (curPerc < endPercent) {
+				         requestAnimationFrame(function () {
+				             animate(curPerc / 100);
+				         });
+				     }
+				 }
+					
+				 animate();*/
+				 
+				
+				drawAnimatedLine(10, 30, 40, 145, 120);
+				//drawAnimatedLine(10, 145, 120, 200, 230);
+				
+			 });
+			 
+			function drawAnimatedLine(speed, fromx, fromy, tox, toy){
+				
+				var canvas=document.getElementById("myCanvas");
+				var context=canvas.getContext("2d");
+				context.strokeStyle="green";
+				
+				console.log('tox:'+tox);
+				console.log('toy:'+toy);
+				
+				var betweenx = Math.abs(fromx - tox);
+				var betweeny = Math.abs(fromy - toy);
+				
+				console.log('betweenx:'+betweenx);
+				console.log('betweeny:'+betweeny);
+				
+				var lowest = (betweenx > betweeny ? betweeny : betweenx);
+				var highest = (betweenx < betweeny ? betweeny : betweenx);
+				
+				console.log('lowest:'+lowest);
+				console.log('highest:'+highest);
+				
+				var steps = highest / lowest;
+				
+				console.log('steps:'+steps);
+				
+				var tx = 0;
+				var ty = 0;
+				
+				if(betweenx > betweeny){
+					ty = steps;
+					tx = 1;
+				}
+				else{
+					ty = 1;
+					tx = steps;
+				}
+				
+				context.moveTo(fromx,fromy);
+				
+				var a = 0;
+				var addx = fromx + tx;
+				var addy = fromy + ty;
+				var animate = setInterval(function(){
+					context.lineTo(addx, addy);
+					context.stroke();
+					if(a == lowest){
+						console.log('stop');
+						clearInterval(animate);
+						return;
+					}
+					console.log('Drawing...');
+					a++;
+					addy += ty;
+					addx += tx;
+				},speed);
+			}
+			
+			
+			function cnvs_getCoordinates(e)
+			{
+				x=e.clientX;
+				y=e.clientY;
+				document.getElementById("xycoordinates").innerHTML="Coordinates: (" + x + "," + y + ")";
+			}
+
+			function cnvs_clearCoordinates()
+			{
+				document.getElementById("xycoordinates").innerHTML="";
+			}
+		</script>
+	</head>
+	<body>
+		<form action="test.php" method="POST">
+			<input type="checkbox" id="test1" name="test[]" value="value1" ><label for="test1">Label1</label><br>
+			<input type="checkbox" id="test2" name="test[]" value="value2" ><label for="test2">Label2</label><br>
+			<input type="checkbox" id="test3" name="test[]" value="value3" checked ><label for="test3">Label3</label><br>
+			<input type="checkbox" id="test4" name="test[]" value="value4" ><label for="test4">Label4</label><br>
+			<input type="submit" value="Test">
+		</form>
+		<canvas id="myCanvas" width="250" height="250" style="border: 1px solid red;" onmousemove="cnvs_getCoordinates(event)" onmouseout="cnvs_clearCoordinates()"></canvas>
+		<div id="xycoordinates"></div>
+	</body>
+</html>
