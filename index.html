@@ -30,6 +30,10 @@
 				margin-left: 6px;
 			}
 			
+			#myCanvas{
+				border: 1px solid green;
+				background: black;
+			}
 			
 		</style>
 		<script>
@@ -94,6 +98,7 @@
 			var canvas = null;
 			var context = null;
 			var cue = [];
+			var debugMode = true;
 			
 			$(document).ready(function(){
 				canvas=document.getElementById("myCanvas");
@@ -142,15 +147,18 @@
 				 animate();*/
 				 
 				
-				drawAnimatedLine(10, 30, 40, 145, 120);
-				drawAnimatedLine(10, 97, 35, 160, 170);
-				drawAnimatedLine(10, 180, 130, 90, 35);
+				drawAnimatedLine(10, 50, 50, 100, 50, 'yellow');
+				//drawAnimatedLine(100, 50, 40, 0, 0, 'yellow');
+				//drawAnimatedLine(100, 50, 50, 49, 90, 'yellow');
+				//drawAnimatedLine(10, 40, 150, 180, 280);
+				//drawAnimatedLine(10, 50, 30, 100, 200);
+				//drawAnimatedLine(10, 130, 50, 200, 220);
 				
 			 });
 			 
 			
 			
-			function drawAnimatedLine(speed, fromx, fromy, tox, toy){
+			function drawAnimatedLine(speed, fromx, fromy, tox, toy, color){
 				
 				key = -1 + (cue.length + 1);
 				cue[key] = {
@@ -159,12 +167,13 @@
 					'fromy': fromy,
 					'tox': tox,
 					'toy': toy,
+					'color': color,
 					'done':false,
 					'bussy':false
 				};
 				
 				if(key == 0){
-					AnimatedLine(speed, fromx, fromy, tox, toy, key);
+					AnimatedLine(speed, fromx, fromy, tox, toy, color, key);
 				}
 				
 			}
@@ -173,66 +182,129 @@
 				$.each(cue, function(key, value){
 					if(!value.done && !value.bussy){
 						value.bussy = true;
-						AnimatedLine(value.speed, value.fromx, value.fromy, value.tox, value.toy, key);
+						AnimatedLine(value.speed, value.fromx, value.fromy, value.tox, value.toy, value.color, key);
 						return false;
 					}
 				});
 			}
 			
-			function AnimatedLine(speed, fromx, fromy, tox, toy, cueKey){
+			function AnimatedLine(speed, fromX, fromY, toX, toY, color, cueKey){
+				
 				context.beginPath();
-				context.strokeStyle="green";
+				context.strokeStyle=color;
+				color = color || 'white';
 				
-				console.log('tox:'+tox);
-				console.log('toy:'+toy);
+				var lineMode = '';
+				var lineDirection = '';
 				
-				var betweenx = Math.abs(fromx - tox);
-				var betweeny = Math.abs(fromy - toy);
+				var betweenX = fromX - toX;
+				var betweenY = fromY - toY;
 				
-				console.log('betweenx:'+betweenx);
-				console.log('betweeny:'+betweeny);
-				
-				var lowest = (betweenx > betweeny ? betweeny : betweenx);
-				var highest = (betweenx < betweeny ? betweeny : betweenx);
-				
-				console.log('lowest:'+lowest);
-				console.log('highest:'+highest);
-				
-				var steps = highest / lowest;
-				
-				console.log('steps:'+steps);
-				
-				var tx = 0;
-				var ty = 0;
-				
-				if(betweenx > betweeny){
-					ty = steps;
-					tx = 1;
+				if(betweenX == 0 && betweenY == 0){
+					console.log('can not write line X'+fromX+' Y'+fromY+' to X'+toX+' Y'+toY);
+					console.log(betweenX + ' '+ betweenY);
+					if(debugMode){
+						console.log('stop');
+					}
+					cue[cueKey].done = true;
+					animateNext();
+					return;
+				}
+				else if(fromY == toY){
+					lineMode = 'horizontal';
+					
+					if(betweenX > 0){
+						lineDirection = 'Z';
+						
+					}
+					else{
+						lineDirection = 'N';
+						
+					}
+					
+					var stop = Math.abs(betweenX);
+					
+				}
+				else if(fromX == toX){
+					lineMode = 'vertical';
 				}
 				else{
-					ty = 1;
-					tx = steps;
+					lineMode = 'horizontalvertical';
+					/*var lowest = (betweenx > betweeny ? betweeny : betweenx);
+					var highest = (betweenx < betweeny ? betweeny : betweenx);
+					
+					var steps = highest / lowest;
+					
+					var tx = 0;
+					var ty = 0;
+					
+					if(betweenx > betweeny){
+						ty = steps;
+						tx = 1;
+					}
+					else{
+						ty = 1;
+						tx = steps;
+					}*/
 				}
 				
-				context.moveTo(fromx,fromy);
+				context.moveTo(fromX,fromY);
 				
+				if(debugMode){
+					console.log('fromx:'+fromX);
+					console.log('fromy:'+fromY);
+					console.log('tox:'+toX);
+					console.log('toy:'+toY);
+					console.log('betweenx:'+betweenX);
+					console.log('betweeny:'+betweenY);
+					console.log('lineMode:'+lineMode);
+					//console.log('lowest:'+lowest);
+					//console.log('highest:'+highest);
+					//console.log('steps:'+steps);
+				}
+				/*
 				var a = 0;
 				var addx = fromx + tx;
 				var addy = fromy + ty;
 				var animate = setInterval(function(){
-					context.lineTo(addx, addy);
+					
 					context.stroke();
 					if(a == lowest){
-						console.log('stop');
+						if(debugMode){
+							console.log('stop');
+						}	
 						clearInterval(animate);
 						cue[cueKey].done = true;
 						animateNext();
 						return;
 					}
-					console.log('Drawing...');
+					if(debugMode){
+						console.log('Drawing...');
+					}
 					a++;
 					addy += ty;
 					addx += tx;
+				},speed);*/
+				
+				var a = 0;
+				var addX = fromX + 1;
+				var animate = setInterval(function(){
+					context.lineTo(addX, toY);
+					context.stroke();
+					if(a == stop){
+						if(debugMode){
+							console.log('stop');
+						}	
+						clearInterval(animate);
+						cue[cueKey].done = true;
+						animateNext();
+						return;
+					}
+					if(debugMode){
+						console.log('Drawing...');
+					}
+					a++;
+					addX -= 1;
 				},speed);
 			}
 			
@@ -266,7 +338,7 @@
 			<input type="checkbox" id="test4" name="test[]" value="value4" ><label for="test4">Label4</label><br>
 			<input type="submit" value="Test">
 		</form>
-		<canvas id="myCanvas" width="250" height="250" style="border: 1px solid red;"></canvas>
+		<canvas id="myCanvas" width="100" height="100" ></canvas>
 		<div id="cor"></div>
 	</body>
 </html>
