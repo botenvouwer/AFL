@@ -3,6 +3,7 @@
 	<head>
 		<title>Animated checkboxes and radio buttons</title>
 		<script src="jquery-2.0.3.js"></script>
+		<script src="drawAnimator.class.js"></script>
 		<style>
 			body{
 				font-family: arial;
@@ -63,6 +64,9 @@
 					handleCanvasCheckbox(this);
 				});
 				
+				var test = new drawAnimator('#myCanvas', true);
+					test.drawAnimatedLine(10, 14, 13, 60, 70, 'yellow', 3);
+				
 			});
 			
 			function handleCanvasCheckbox(checkBoxCanvas){
@@ -94,7 +98,7 @@
 			}
 		</script>
 		<script>
-		
+			/*
 			var canvas = null;
 			var context = null;
 			var cue = [];
@@ -103,61 +107,22 @@
 			$(document).ready(function(){
 				canvas=document.getElementById("myCanvas");
 				context=canvas.getContext("2d");
-		
-			
-				/*// animated circle
-				(function() {
-				  var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-				                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-				  window.requestAnimationFrame = requestAnimationFrame;
-				})();
-				 
 				
-				var canvas = document.getElementById('myCanvas');
-				 var context = canvas.getContext('2d');
-				 var x = canvas.width / 2;
-				 var y = canvas.height / 2;
-				 var radius = 50;
-				 var endPercent = 110;
-				 var curPerc = 0;
-				 var circ = Math.PI * 2;
-				 var quart = Math.PI / 2;
-				
-				 context.lineWidth = 2;
-				 context.strokeStyle = '#ad2323';
-				 context.shadowOffsetX = 0;
-				 context.shadowOffsetY = 0;
-				 context.shadowBlur = 10;
-				 context.shadowColor = '#656565';
-				
-				
-				 function animate(current) {
-				     context.clearRect(0, 0, canvas.width, canvas.height);
-				     context.beginPath();
-				     context.arc(x, y, radius, -(quart), ((circ) * current) - quart, false);
-				     context.stroke();
-				     curPerc++;
-				     if (curPerc < endPercent) {
-				         requestAnimationFrame(function () {
-				             animate(curPerc / 100);
-				         });
-				     }
-				 }
-					
-				 animate();*/
-				 
-				
-				drawAnimatedLine(10, 50, 10, 100, 10, 'yellow', 1);
-				drawAnimatedLine(20, 50, 30, 0, 30, 'yellow', 2);
-				drawAnimatedLine(10, 50, 40, 50, 0, 'white', 3);
-				drawAnimatedLine(30, 80, 60, 80, 100, 'green', 8);
+				drawAnimatedLine(10, 14, 13, 60, 70, 'yellow', 3);
+				drawAnimatedLine(10, 50, 60, 87, 33, 'yellow', 3);
+				//drawAnimatedLine(10, 50, 40, 50, 0, 'white', 3);
+				//drawAnimatedLine(30, 80, 60, 80, 100, 'green', 8);
 				//drawAnimatedLine(10, 40, 150, 180, 280);
 				//drawAnimatedLine(10, 50, 30, 100, 200);
 				//drawAnimatedLine(10, 130, 50, 200, 220);
 				
 			 });
 			 
-			
+			function drawAnimatedLines(array){
+				$.each(array, function(key, value){
+					drawAnimatedLine(value);
+				});
+			}
 			
 			function drawAnimatedLine(speed, fromx, fromy, tox, toy, color, lineWidth){
 				
@@ -198,6 +163,9 @@
 				
 				var addX = 0;
 				var addY = 0;
+				var stop = 0;
+				var stepX = 1;
+				var stepY = 1;
 				
 				var lineMode = '';
 				var lineDirection = '';
@@ -228,7 +196,7 @@
 						addX = fromX - 1;
 					}
 					
-					var stop = Math.abs(betweenX);
+					stop = Math.abs(betweenX);
 					
 				}
 				else if(fromX == toX){
@@ -244,41 +212,43 @@
 						addY = fromY - 1;
 					}
 					
-					var stop = Math.abs(betweenY);
+					stop = Math.abs(betweenY);
 				}
 				else{
 					lineMode = 'horizontalvertical';
 					
-					var lowest = (betweenx > betweeny ? betweeny : betweenx);
-					var highest = (betweenx < betweeny ? betweeny : betweenx);
-					
-					var steps = highest / lowest;
-					
-					if(){
-						lineDirection = '';
+					if(betweenX > 0 && betweenY > 0){
+						lineDirection = 'NO';
 					}
-					else if(){
-						lineDirection = '';
+					else if(betweenX < 0 && betweenY > 0){
+						lineDirection = 'ZO';
+						
 					}
-					else if(){
-						lineDirection = '';
+					else if(betweenX < 0 && betweenY < 0){
+						lineDirection = 'ZW';
+						
 					}
-					else if(){
-						lineDirection = '';
+					else if(betweenX > 0 && betweenY < 0){
+						lineDirection = 'NW';
+						
 					}
 					
-					
-					
-					var addX = 0;
-					var addY = 0;
-					
-					if(betweenx > betweeny){
-						addX = steps;
-						addY = 1;
+					if(betweenX == betweenY){
+						stop = Math.abs(betweenX);
+						addX = fromX + stepX;
+						addY = fromY + stepY;
 					}
-					else{
-						addX = 1;
-						addY = steps;
+					else if(betweenX > betweenY){
+						stop = Math.abs(betweenX);
+						stepX = Math.abs(betweenX) / Math.abs(betweenY);
+						addX = fromX + stepX;
+						addY = fromY + stepY;
+					}
+					else if(betweenX < betweenY){
+						stop = Math.abs(betweenY);
+						stepY = Math.abs(betweenY) / Math.abs(betweenX);
+						addX = fromX + stepX;
+						addY = fromY + stepY;
 					}
 				}
 				
@@ -290,38 +260,14 @@
 					console.log('tox:'+toX);
 					console.log('toy:'+toY);
 					console.log('betweenx:'+betweenX);
+					console.log('stepX:'+stepX);
 					console.log('betweeny:'+betweenY);
+					console.log('stepY:'+stepY);
 					console.log('lineMode:'+lineMode);
 					console.log('lineDirection:'+lineDirection);
 					console.log('lineWidth:'+lineWidth);
 					console.log('color:'+color);
-					//console.log('lowest:'+lowest);
-					//console.log('highest:'+highest);
-					//console.log('steps:'+steps);
 				}
-				/*
-				var a = 0;
-				var addx = fromx + tx;
-				var addy = fromy + ty;
-				var animate = setInterval(function(){
-					
-					context.stroke();
-					if(a == lowest){
-						if(debugMode){
-							console.log('stop');
-						}	
-						clearInterval(animate);
-						cue[cueKey].done = true;
-						animateNext();
-						return;
-					}
-					if(debugMode){
-						console.log('Drawing...');
-					}
-					a++;
-					addy += ty;
-					addx += tx;
-				},speed);*/
 				
 				var a = 0;
 				var animate = setInterval(function(){
@@ -341,22 +287,36 @@
 					}
 					a++;
 					if(lineDirection == 'Z'){
-						addX += 1;
+						addX += stepX;
 					}
 					else if(lineDirection == 'N'){
-						addX -= 1;
+						addX -= stepX;
 					}
 					else if(lineDirection == 'O'){
-						addY -= 1;
+						addY -= stepY;
 					}
 					else if(lineDirection == 'W'){
-						addY += 1;
+						addY += stepY;
 					}
-					
-					
+					else if(lineDirection == 'NO'){
+						addX -= stepX;
+						addY -= stepY;
+					}
+					else if(lineDirection == 'ZO'){
+						addX += stepX;
+						addY -= stepY;
+					}
+					else if(lineDirection == 'ZW'){
+						addX += stepX;
+						addY += stepY;
+					}
+					else if(lineDirection == 'NW'){
+						addX -= stepX;
+						addY += stepY;
+					}	
 				},speed);
 			}
-			
+			*/
 			$(document).ready(function(){
 			 	function writeMessage(message) {
 		        	$('#cor').html(message);
