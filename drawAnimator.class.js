@@ -1,19 +1,24 @@
 var drawAnimator = function(canvasQuery, debug){
 				
-	this.canvas = $(canvasQuery);
+	this.canvas = canvasQuery;
 	this.context = this.canvas.getContext("2d");
 	this.cue = [];
 	this.debugMode = debug || false;
-
+	dit = this;
+	
+	this.reset = function(){
+		this.context.clearRect(0,0,this.canvas.width, this.canvas.height);
+	}
+	
 	this.drawAnimatedLines = function(array){
 		$.each(array, function(key, value){
-			this.drawAnimatedLine(value);
+			dit.drawAnimatedLine(value);
 		});
 	}
 
 	this.drawAnimatedLine = function(speed, fromx, fromy, tox, toy, color, lineWidth){
-		var key = -1 + (cue.length + 1);
-		cue[key] = {
+		var key = -1 + (dit.cue.length + 1);
+		dit.cue[key] = {
 			'speed': speed,
 			'fromx': fromx,
 			'fromy': fromy,
@@ -26,24 +31,27 @@ var drawAnimator = function(canvasQuery, debug){
 		};
 		
 		if(key == 0){
-			this.AnimatedLine(speed, fromx, fromy, tox, toy, color, lineWidth, key);
+			AnimatedLine(speed, fromx, fromy, tox, toy, color, lineWidth, key);
 		}
 	}
 
 	var animateNext = function(){
-		$.each(this.cue, function(key, value){
+		$.each(dit.cue, function(key, value){
 			if(!value.done && !value.bussy){
 				value.bussy = true;
-				this.AnimatedLine(value.speed, value.fromx, value.fromy, value.tox, value.toy, value.color, value.lineWidth, key);
+				AnimatedLine(value.speed, value.fromx, value.fromy, value.tox, value.toy, value.color, value.lineWidth, key);
 				return false;
 			}
 		});
 	}
 
 	var AnimatedLine = function(speed, fromX, fromY, toX, toY, color, lineWidth, cueKey){
-		this.context.beginPath();
-		this.context.lineWidth = lineWidth || 1;
-		this.context.strokeStyle = color || 'white';
+		/*if(dit.debugMode){
+			console.log(dit.canvas);
+		}*/
+		dit.context.beginPath();
+		dit.context.lineWidth = lineWidth || 1;
+		dit.context.strokeStyle = color || 'white';
 		
 		var addX = 0;
 		var addY = 0;
@@ -60,11 +68,11 @@ var drawAnimator = function(canvasQuery, debug){
 		if(betweenX == 0 && betweenY == 0){
 			console.log('can not write line X'+fromX+' Y'+fromY+' to X'+toX+' Y'+toY);
 			console.log(betweenX + ' '+ betweenY);
-			if(this.debugMode){
+			if(dit.debugMode){
 				console.log('stop');
 			}
-			this.cue[cueKey].done = true;
-			this.animateNext();
+			dit.cue[cueKey].done = true;
+			dit.animateNext();
 			return;
 		}
 		else if(fromY == toY){
@@ -136,9 +144,9 @@ var drawAnimator = function(canvasQuery, debug){
 			}
 		}
 		
-		context.moveTo(fromX,fromY);
+		dit.context.moveTo(fromX,fromY);
 		
-		if(this.debugMode){
+		if(dit.debugMode){
 			console.log('fromx:'+fromX);
 			console.log('fromy:'+fromY);
 			console.log('tox:'+toX);
@@ -155,18 +163,18 @@ var drawAnimator = function(canvasQuery, debug){
 		
 		var a = 0;
 		var animate = setInterval(function(){
-			context.lineTo(addX, addY);
-			context.stroke();
+			dit.context.lineTo(addX, addY);
+			dit.context.stroke();
 			if(a == stop){
-				if(this.debugMode){
+				if(dit.debugMode){
 					console.log('stop');
 				}	
 				clearInterval(animate);
-				this.cue[cueKey].done = true;
-				this.animateNext();
+				dit.cue[cueKey].done = true;
+				animateNext();
 				return;
 			}
-			if(this.debugMode){
+			if(dit.debugMode){
 				console.log('Drawing...');
 			}
 			a++;

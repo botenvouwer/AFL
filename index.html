@@ -10,8 +10,6 @@
 			}
 			
 			.checkbox-canvas{
-				width: 15px;
-				height: 15px;
 				border: 1px solid rgb(0, 0, 0);
 				background: rgb(255, 255, 255);
 				margin: 0px;
@@ -42,7 +40,7 @@
 				
 				$('input[type=checkbox]').each(function(key, checkbox){
 					var id = $(this).attr('id');
-					var canvasChekbox = '<canvas id="checkbox_canvas_'+id+'" class="checkbox-canvas" ></canvas>';
+					var canvasChekbox = '<canvas id="checkbox_canvas_'+id+'" width="15" height="15" class="checkbox-canvas" ></canvas>';
 					
 					$(this).after(canvasChekbox);
 					$(this).css('display', 'none');
@@ -64,9 +62,9 @@
 					handleCanvasCheckbox(this);
 				});
 				
-				var test = new drawAnimator('#myCanvas', true);
-					test.drawAnimatedLine(10, 14, 13, 60, 70, 'yellow', 3);
-				
+				var test = new drawAnimator($('#myCanvas')[0], true);
+					test.drawAnimatedLine(10, 0, 0, 10, 13, 'yellow', 1);
+					test.drawAnimatedLine(10, 12, 9, 14, 5, 'yellow', 1);
 			});
 			
 			function handleCanvasCheckbox(checkBoxCanvas){
@@ -88,235 +86,22 @@
 			}
 			
 			function resetCanvasCheckbox(checkBoxCanvas){
+				var id = $(checkBoxCanvas).attr('id');
+				var checkSign = new drawAnimator($('#'+id)[0], true);
+					checkSign.reset();
 				$(checkBoxCanvas).css('border', '1px solid');
 			}
 			
 			function animateCanvasChekbox(checkBoxCanvas){
-				
+				var id = $(checkBoxCanvas).attr('id');
+				var checkSign = new drawAnimator($('#'+id)[0], true);
+					checkSign.drawAnimatedLine(10, 4, 8, 8, 14, 'green', 1);
+					checkSign.drawAnimatedLine(10, 8, 14, 12, 2, 'green', 1);
 				$(checkBoxCanvas).css('border', '1px solid red');
 				
 			}
 		</script>
 		<script>
-			/*
-			var canvas = null;
-			var context = null;
-			var cue = [];
-			var debugMode = true;
-			
-			$(document).ready(function(){
-				canvas=document.getElementById("myCanvas");
-				context=canvas.getContext("2d");
-				
-				drawAnimatedLine(10, 14, 13, 60, 70, 'yellow', 3);
-				drawAnimatedLine(10, 50, 60, 87, 33, 'yellow', 3);
-				//drawAnimatedLine(10, 50, 40, 50, 0, 'white', 3);
-				//drawAnimatedLine(30, 80, 60, 80, 100, 'green', 8);
-				//drawAnimatedLine(10, 40, 150, 180, 280);
-				//drawAnimatedLine(10, 50, 30, 100, 200);
-				//drawAnimatedLine(10, 130, 50, 200, 220);
-				
-			 });
-			 
-			function drawAnimatedLines(array){
-				$.each(array, function(key, value){
-					drawAnimatedLine(value);
-				});
-			}
-			
-			function drawAnimatedLine(speed, fromx, fromy, tox, toy, color, lineWidth){
-				
-				key = -1 + (cue.length + 1);
-				cue[key] = {
-					'speed': speed,
-					'fromx': fromx,
-					'fromy': fromy,
-					'tox': tox,
-					'toy': toy,
-					'color': color,
-					'lineWidth': lineWidth,
-					'done':false,
-					'bussy':false
-				};
-				
-				if(key == 0){
-					AnimatedLine(speed, fromx, fromy, tox, toy, color, lineWidth, key);
-				}
-				
-			}
-			
-			function animateNext(){
-				$.each(cue, function(key, value){
-					if(!value.done && !value.bussy){
-						value.bussy = true;
-						AnimatedLine(value.speed, value.fromx, value.fromy, value.tox, value.toy, value.color, value.lineWidth, key);
-						return false;
-					}
-				});
-			}
-			
-			function AnimatedLine(speed, fromX, fromY, toX, toY, color, lineWidth, cueKey){
-				
-				context.beginPath();
-				context.lineWidth = lineWidth || 1;
-				context.strokeStyle = color || 'white';
-				
-				var addX = 0;
-				var addY = 0;
-				var stop = 0;
-				var stepX = 1;
-				var stepY = 1;
-				
-				var lineMode = '';
-				var lineDirection = '';
-				
-				var betweenX = fromX - toX;
-				var betweenY = fromY - toY;
-				
-				if(betweenX == 0 && betweenY == 0){
-					console.log('can not write line X'+fromX+' Y'+fromY+' to X'+toX+' Y'+toY);
-					console.log(betweenX + ' '+ betweenY);
-					if(debugMode){
-						console.log('stop');
-					}
-					cue[cueKey].done = true;
-					animateNext();
-					return;
-				}
-				else if(fromY == toY){
-					lineMode = 'horizontal';
-					addY = toY;
-					
-					if(betweenX > 0){
-						lineDirection = 'N';
-						addX = fromX + 1;
-					}
-					else{
-						lineDirection = 'Z';
-						addX = fromX - 1;
-					}
-					
-					stop = Math.abs(betweenX);
-					
-				}
-				else if(fromX == toX){
-					lineMode = 'vertical';
-					addX = toX;
-					
-					if(betweenY > 0){
-						lineDirection = 'O';
-						addY = fromY + 1;
-					}
-					else{
-						lineDirection = 'W';
-						addY = fromY - 1;
-					}
-					
-					stop = Math.abs(betweenY);
-				}
-				else{
-					lineMode = 'horizontalvertical';
-					
-					if(betweenX > 0 && betweenY > 0){
-						lineDirection = 'NO';
-					}
-					else if(betweenX < 0 && betweenY > 0){
-						lineDirection = 'ZO';
-						
-					}
-					else if(betweenX < 0 && betweenY < 0){
-						lineDirection = 'ZW';
-						
-					}
-					else if(betweenX > 0 && betweenY < 0){
-						lineDirection = 'NW';
-						
-					}
-					
-					if(betweenX == betweenY){
-						stop = Math.abs(betweenX);
-						addX = fromX + stepX;
-						addY = fromY + stepY;
-					}
-					else if(betweenX > betweenY){
-						stop = Math.abs(betweenX);
-						stepX = Math.abs(betweenX) / Math.abs(betweenY);
-						addX = fromX + stepX;
-						addY = fromY + stepY;
-					}
-					else if(betweenX < betweenY){
-						stop = Math.abs(betweenY);
-						stepY = Math.abs(betweenY) / Math.abs(betweenX);
-						addX = fromX + stepX;
-						addY = fromY + stepY;
-					}
-				}
-				
-				context.moveTo(fromX,fromY);
-				
-				if(debugMode){
-					console.log('fromx:'+fromX);
-					console.log('fromy:'+fromY);
-					console.log('tox:'+toX);
-					console.log('toy:'+toY);
-					console.log('betweenx:'+betweenX);
-					console.log('stepX:'+stepX);
-					console.log('betweeny:'+betweenY);
-					console.log('stepY:'+stepY);
-					console.log('lineMode:'+lineMode);
-					console.log('lineDirection:'+lineDirection);
-					console.log('lineWidth:'+lineWidth);
-					console.log('color:'+color);
-				}
-				
-				var a = 0;
-				var animate = setInterval(function(){
-					context.lineTo(addX, addY);
-					context.stroke();
-					if(a == stop){
-						if(debugMode){
-							console.log('stop');
-						}	
-						clearInterval(animate);
-						cue[cueKey].done = true;
-						animateNext();
-						return;
-					}
-					if(debugMode){
-						console.log('Drawing...');
-					}
-					a++;
-					if(lineDirection == 'Z'){
-						addX += stepX;
-					}
-					else if(lineDirection == 'N'){
-						addX -= stepX;
-					}
-					else if(lineDirection == 'O'){
-						addY -= stepY;
-					}
-					else if(lineDirection == 'W'){
-						addY += stepY;
-					}
-					else if(lineDirection == 'NO'){
-						addX -= stepX;
-						addY -= stepY;
-					}
-					else if(lineDirection == 'ZO'){
-						addX += stepX;
-						addY -= stepY;
-					}
-					else if(lineDirection == 'ZW'){
-						addX += stepX;
-						addY += stepY;
-					}
-					else if(lineDirection == 'NW'){
-						addX -= stepX;
-						addY += stepY;
-					}	
-				},speed);
-			}
-			*/
 			$(document).ready(function(){
 			 	function writeMessage(message) {
 		        	$('#cor').html(message);
@@ -343,11 +128,11 @@
 		<form action="test.php" method="POST">
 			<input type="checkbox" id="test1" name="test[]" value="value1" ><label for="test1">Label1</label><br>
 			<input type="checkbox" id="test2" name="test[]" value="value2" ><label for="test2">Label2</label><br>
-			<input type="checkbox" id="test3" name="test[]" value="value3" checked ><label for="test3">Label3</label><br>
-			<input type="checkbox" id="test4" name="test[]" value="value4" ><label for="test4">Label4</label><br>
+			<input type="checkbox" id="test3" name="test[]" value="value3" ><label for="test3">Label3</label><br>
+			<input type="checkbox" id="test4" name="test[]" value="value4" checked ><label for="test4">Label4</label><br>
 			<input type="submit" value="Test">
 		</form>
-		<canvas id="myCanvas" width="100" height="100" ></canvas>
+		<canvas id="myCanvas" width="15" height="15" ></canvas>
 		<div id="cor"></div>
 	</body>
 </html>
