@@ -147,9 +147,10 @@
 				 animate();*/
 				 
 				
-				drawAnimatedLine(10, 50, 50, 100, 50, 'yellow');
-				//drawAnimatedLine(100, 50, 40, 0, 0, 'yellow');
-				//drawAnimatedLine(100, 50, 50, 49, 90, 'yellow');
+				drawAnimatedLine(10, 50, 10, 100, 10, 'yellow', 1);
+				drawAnimatedLine(20, 50, 30, 0, 30, 'yellow', 2);
+				drawAnimatedLine(10, 50, 40, 50, 0, 'white', 3);
+				drawAnimatedLine(30, 80, 60, 80, 100, 'green', 8);
 				//drawAnimatedLine(10, 40, 150, 180, 280);
 				//drawAnimatedLine(10, 50, 30, 100, 200);
 				//drawAnimatedLine(10, 130, 50, 200, 220);
@@ -158,7 +159,7 @@
 			 
 			
 			
-			function drawAnimatedLine(speed, fromx, fromy, tox, toy, color){
+			function drawAnimatedLine(speed, fromx, fromy, tox, toy, color, lineWidth){
 				
 				key = -1 + (cue.length + 1);
 				cue[key] = {
@@ -168,12 +169,13 @@
 					'tox': tox,
 					'toy': toy,
 					'color': color,
+					'lineWidth': lineWidth,
 					'done':false,
 					'bussy':false
 				};
 				
 				if(key == 0){
-					AnimatedLine(speed, fromx, fromy, tox, toy, color, key);
+					AnimatedLine(speed, fromx, fromy, tox, toy, color, lineWidth, key);
 				}
 				
 			}
@@ -182,17 +184,20 @@
 				$.each(cue, function(key, value){
 					if(!value.done && !value.bussy){
 						value.bussy = true;
-						AnimatedLine(value.speed, value.fromx, value.fromy, value.tox, value.toy, value.color, key);
+						AnimatedLine(value.speed, value.fromx, value.fromy, value.tox, value.toy, value.color, value.lineWidth, key);
 						return false;
 					}
 				});
 			}
 			
-			function AnimatedLine(speed, fromX, fromY, toX, toY, color, cueKey){
+			function AnimatedLine(speed, fromX, fromY, toX, toY, color, lineWidth, cueKey){
 				
 				context.beginPath();
-				context.strokeStyle=color;
-				color = color || 'white';
+				context.lineWidth = lineWidth || 1;
+				context.strokeStyle = color || 'white';
+				
+				var addX = 0;
+				var addY = 0;
 				
 				var lineMode = '';
 				var lineDirection = '';
@@ -212,14 +217,15 @@
 				}
 				else if(fromY == toY){
 					lineMode = 'horizontal';
+					addY = toY;
 					
 					if(betweenX > 0){
-						lineDirection = 'Z';
-						
+						lineDirection = 'N';
+						addX = fromX + 1;
 					}
 					else{
-						lineDirection = 'N';
-						
+						lineDirection = 'Z';
+						addX = fromX - 1;
 					}
 					
 					var stop = Math.abs(betweenX);
@@ -227,25 +233,53 @@
 				}
 				else if(fromX == toX){
 					lineMode = 'vertical';
+					addX = toX;
+					
+					if(betweenY > 0){
+						lineDirection = 'O';
+						addY = fromY + 1;
+					}
+					else{
+						lineDirection = 'W';
+						addY = fromY - 1;
+					}
+					
+					var stop = Math.abs(betweenY);
 				}
 				else{
 					lineMode = 'horizontalvertical';
-					/*var lowest = (betweenx > betweeny ? betweeny : betweenx);
+					
+					var lowest = (betweenx > betweeny ? betweeny : betweenx);
 					var highest = (betweenx < betweeny ? betweeny : betweenx);
 					
 					var steps = highest / lowest;
 					
-					var tx = 0;
-					var ty = 0;
+					if(){
+						lineDirection = '';
+					}
+					else if(){
+						lineDirection = '';
+					}
+					else if(){
+						lineDirection = '';
+					}
+					else if(){
+						lineDirection = '';
+					}
+					
+					
+					
+					var addX = 0;
+					var addY = 0;
 					
 					if(betweenx > betweeny){
-						ty = steps;
-						tx = 1;
+						addX = steps;
+						addY = 1;
 					}
 					else{
-						ty = 1;
-						tx = steps;
-					}*/
+						addX = 1;
+						addY = steps;
+					}
 				}
 				
 				context.moveTo(fromX,fromY);
@@ -258,6 +292,9 @@
 					console.log('betweenx:'+betweenX);
 					console.log('betweeny:'+betweenY);
 					console.log('lineMode:'+lineMode);
+					console.log('lineDirection:'+lineDirection);
+					console.log('lineWidth:'+lineWidth);
+					console.log('color:'+color);
 					//console.log('lowest:'+lowest);
 					//console.log('highest:'+highest);
 					//console.log('steps:'+steps);
@@ -287,9 +324,8 @@
 				},speed);*/
 				
 				var a = 0;
-				var addX = fromX + 1;
 				var animate = setInterval(function(){
-					context.lineTo(addX, toY);
+					context.lineTo(addX, addY);
 					context.stroke();
 					if(a == stop){
 						if(debugMode){
@@ -304,7 +340,20 @@
 						console.log('Drawing...');
 					}
 					a++;
-					addX -= 1;
+					if(lineDirection == 'Z'){
+						addX += 1;
+					}
+					else if(lineDirection == 'N'){
+						addX -= 1;
+					}
+					else if(lineDirection == 'O'){
+						addY -= 1;
+					}
+					else if(lineDirection == 'W'){
+						addY += 1;
+					}
+					
+					
 				},speed);
 			}
 			
